@@ -5,11 +5,11 @@ description: Update Software Development Factory roadmap milestone and assignmen
 
 # Factory Roadmap
 
-Deterministic updates to [factory/roadmap.md](../../factory/roadmap.md).
+Deterministic updates to [factory/roadmap.md](../../../factory/roadmap.md).
 
 ## Read first
 
-Always read current roadmap and [factory/project-vision.md](../../factory/project-vision.md) before editing.
+Always read current roadmap and [factory/project-vision.md](../../../factory/project-vision.md) before editing.
 
 ## Update milestone status
 
@@ -65,4 +65,4 @@ Log with `--action adjusted`.
 
 Only mark project complete when **Completion Checklist** in roadmap can be checked off. Requires all milestones `done` or `skipped`, vision criteria met, and final auditor pass.
 
-When setting a milestone to `done`, update [factory/milestone-paths.json](../../factory/milestone-paths.json) with path prefixes to protect via hooks.
+When setting a milestone to `done`, update [factory/milestone-paths.json](../../../factory/milestone-paths.json) with path prefixes to protect via hooks.

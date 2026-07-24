@@ -4,15 +4,19 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HOOKS = ROOT / ".cursor" / "hooks"
+WORKSPACE_ROOT = ROOT
 
 
 def run_hook(script: str, payload: dict) -> dict:
+    payload = {**payload, "workspace_roots": [str(WORKSPACE_ROOT)]}
     result = subprocess.run(
         [sys.executable, str(HOOKS / script)],
         input=json.dumps(payload),
@@ -25,7 +29,7 @@ def run_hook(script: str, payload: dict) -> dict:
 
 
 def test_session_start():
-    out = run_hook("session_start.py", {"workspace_roots": [str(ROOT)]})
+    out = run_hook("session_start.py", {})
     assert "additional_context" in out
     assert "Software Development Factory" in out["additional_context"]
     print("session_start: ok")
@@ -35,7 +39,6 @@ def test_subagent_start_denies_missing_assignment():
     out = run_hook(
         "subagent_start.py",
         {
-            "workspace_roots": [str(ROOT)],
             "task": "Design the API layer as architect",
             "subagent_type": "architect",
         },
@@ -48,7 +51,6 @@ def test_subagent_start_allows_with_assignment():
     out = run_hook(
         "subagent_start.py",
         {
-            "workspace_roots": [str(ROOT)],
             "task": "Assignment factory/assignments/architect-M1-01.md — design layout",
             "subagent_type": "architect",
         },
@@ -61,7 +63,6 @@ def test_subagent_stop_followup():
     out = run_hook(
         "subagent_stop.py",
         {
-            "workspace_roots": [str(ROOT)],
             "task": "architect-M2-01 done",
             "subagent_type": "architect",
             "status": "completed",
@@ -69,6 +70,11 @@ def test_subagent_stop_followup():
     )
     assert "followup_message" in out
     assert "/auditor" in out["followup_message"]
+    log_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (WORKSPACE_ROOT / "factory" / "log").glob("*.jsonl")
+    )
+    assert '"action": "completed"' not in log_text
     print("subagent_stop followup: ok")
 
 
@@ -76,9 +82,8 @@ def test_protect_done_milestones_allows_unprotected():
     out = run_hook(
         "protect_done_milestones.py",
         {
-            "workspace_roots": [str(ROOT)],
             "tool_name": "Write",
-            "tool_input": {"path": str(ROOT / "e2e" / "new.spec.ts")},
+            "tool_input": {"path": str(WORKSPACE_ROOT / "e2e" / "new.spec.ts")},
         },
     )
     assert out.get("permission") == "allow"
@@ -107,7 +112,6 @@ def test_subagent_stop_followup_implementer():
     out = run_hook(
         "subagent_stop.py",
         {
-            "workspace_roots": [str(ROOT)],
             "task": "implementer-M2-01 complete",
             "subagent_type": "implementer",
             "status": "completed",
@@ -123,7 +127,6 @@ def test_log_task_delegation():
     out = run_hook(
         "log_task_delegation.py",
         {
-            "workspace_roots": [str(ROOT)],
             "tool_name": "Task",
             "tool_input": {
                 "prompt": "Assignment factory/assignments/tester-M3-01.md — write e2e tests",
@@ -141,7 +144,6 @@ def test_log_task_result():
     out = run_hook(
         "log_task_result.py",
         {
-            "workspace_roots": [str(ROOT)],
             "tool_name": "Task",
             "tool_input": {
                 "prompt": "tester-M3-01",
@@ -157,7 +159,7 @@ def test_log_task_result():
 def test_log_agent_response_skips_non_factory():
     out = run_hook(
         "log_agent_response.py",
-        {"workspace_roots": [str(ROOT)], "text": "Here is a generic answer."},
+        {"text": "Here is a generic answer."},
     )
     assert out == {}
     print("log_agent_response skip: ok")
@@ -167,7 +169,6 @@ def test_log_agent_response_logs_factory():
     out = run_hook(
         "log_agent_response.py",
         {
-            "workspace_roots": [str(ROOT)],
             "text": "Delegated implementer-M2-01 to /implementer for core game work.",
         },
     )
@@ -181,6 +182,7 @@ def test_view_messages_script():
         cwd=ROOT,
         capture_output=True,
         text=True,
+        env={**os.environ, "FACTORY_ROOT": str(WORKSPACE_ROOT)},
     )
     assert result.returncode == 0
     assert "Factory conversation log" in result.stdout
@@ -188,23 +190,39 @@ def test_view_messages_script():
 
 
 def main() -> int:
-    tests = [
-        test_session_start,
-        test_subagent_start_denies_missing_assignment,
-        test_subagent_start_allows_with_assignment,
-        test_subagent_stop_followup,
-        test_subagent_stop_followup_implementer,
-        test_log_task_delegation,
-        test_log_task_result,
-        test_log_agent_response_skips_non_factory,
-        test_log_agent_response_logs_factory,
-        test_view_messages_script,
-        test_protect_done_milestones_allows_unprotected,
-        test_block_git_push_denies,
-        test_block_git_push_allows_commit,
-    ]
-    for test in tests:
-        test()
+    global WORKSPACE_ROOT
+    with tempfile.TemporaryDirectory() as directory:
+        WORKSPACE_ROOT = Path(directory)
+        factory = WORKSPACE_ROOT / "factory"
+        (factory / "assignments").mkdir(parents=True)
+        (factory / "project-vision.md").write_text(
+            "## Summary\n\nTest factory vision.\n", encoding="utf-8"
+        )
+        (factory / "roadmap.md").write_text(
+            "## Current Phase\n\nTest phase.\n\n"
+            "## Milestones\n\n"
+            "| ID | Milestone | Owner | Status |\n"
+            "|----|-----------|-------|--------|\n"
+            "| M1 | Test | architect | pending |\n",
+            encoding="utf-8",
+        )
+        tests = [
+            test_session_start,
+            test_subagent_start_denies_missing_assignment,
+            test_subagent_start_allows_with_assignment,
+            test_subagent_stop_followup,
+            test_subagent_stop_followup_implementer,
+            test_log_task_delegation,
+            test_log_task_result,
+            test_log_agent_response_skips_non_factory,
+            test_log_agent_response_logs_factory,
+            test_view_messages_script,
+            test_protect_done_milestones_allows_unprotected,
+            test_block_git_push_denies,
+            test_block_git_push_allows_commit,
+        ]
+        for test in tests:
+            test()
     print(f"\n{len(tests)} hook tests passed")
     return 0
 

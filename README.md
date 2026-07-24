@@ -27,7 +27,7 @@ A Cursor-native framework for orchestrating AI agents like a software developmen
 ## Directory layout
 
 ```
-hello-agent/
+your-project/
 ├── AGENTS.md                 # Factory overview for any AI agent
 ├── factory/
 │   ├── project-vision.md     # End-state definition

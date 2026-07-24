@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from collections import defaultdict
@@ -22,6 +23,9 @@ KIND_LABELS = {
 
 
 def repo_root() -> Path:
+    configured_root = os.environ.get("FACTORY_ROOT")
+    if configured_root:
+        return Path(configured_root).resolve()
     return Path(__file__).resolve().parents[4]
 
 

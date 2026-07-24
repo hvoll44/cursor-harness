@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -283,7 +284,13 @@ def run_log(
         cmd.extend(["--milestone", milestone])
     if details:
         cmd.extend(["--details", json.dumps(details, ensure_ascii=False)])
-    subprocess.run(cmd, cwd=root, check=False, capture_output=True)
+    subprocess.run(
+        cmd,
+        cwd=root,
+        check=False,
+        capture_output=True,
+        env={**os.environ, "FACTORY_ROOT": str(root)},
+    )
 
 
 def run_log_message(
@@ -323,7 +330,13 @@ def run_log_message(
         cmd.extend(["--milestone", milestone])
     if details:
         cmd.extend(["--details", json.dumps(details, ensure_ascii=False)])
-    subprocess.run(cmd, cwd=root, check=False, capture_output=True)
+    subprocess.run(
+        cmd,
+        cwd=root,
+        check=False,
+        capture_output=True,
+        env={**os.environ, "FACTORY_ROOT": str(root)},
+    )
 
 
 def read_roadmap_summary(root: Path) -> str:

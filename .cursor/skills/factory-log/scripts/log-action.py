@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -35,6 +36,9 @@ VALID_MESSAGE_KINDS = {
 
 def repo_root() -> Path:
     """Resolve repo root from script location: .cursor/skills/factory-log/scripts/"""
+    configured_root = os.environ.get("FACTORY_ROOT")
+    if configured_root:
+        return Path(configured_root).resolve()
     return Path(__file__).resolve().parents[4]
 
 

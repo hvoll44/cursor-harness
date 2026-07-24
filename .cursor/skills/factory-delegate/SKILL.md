@@ -12,7 +12,7 @@ Deterministic workflow for the **system** agent to delegate work to specialists.
 ### 1. Choose target and milestone
 
 Pick subagent: `architect` | `implementer` | `tester` | `auditor`  
-Pick roadmap milestone ID from [factory/roadmap.md](../../factory/roadmap.md).
+Pick roadmap milestone ID from [factory/roadmap.md](../../../factory/roadmap.md).
 
 Delegate `implementer` only after architecture exists (`docs/architecture.md` or explicit structure in the assignment).
 
@@ -22,7 +22,7 @@ Format: `{agent}-{milestone}-{seq}` — increment seq per agent+milestone (01, 0
 
 ### 3. Create assignment file
 
-Copy [factory/assignments/_template.md](../../factory/assignments/_template.md) to:
+Copy [factory/assignments/_template.md](../../../factory/assignments/_template.md) to:
 
 ```
 factory/assignments/{assignment-id}.md
@@ -39,7 +39,7 @@ Fill **Objective**, **Context from System**, **Acceptance Criteria**, and **Deli
 
 ### 4. Update roadmap
 
-In [factory/roadmap.md](../../factory/roadmap.md):
+In [factory/roadmap.md](../../../factory/roadmap.md):
 
 - Add row to **Active Assignments**
 - Set milestone status to `in_progress` if it was `pending`

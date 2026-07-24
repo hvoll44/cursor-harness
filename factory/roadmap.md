@@ -6,14 +6,14 @@
 
 ## Current Phase
 
-**Phase 1 — Playable browser prototype** — Architecture, core gameplay, and automated E2E verification.
+**Phase 1 — Playable browser prototype** — Architecture, core gameplay, and automated E2E verification have not started.
 
 ## Milestones
 
 | ID | Milestone | Owner | Status | Depends On | Notes |
 |----|-----------|-------|--------|------------|-------|
-| M1 | Architecture & project structure | architect | done | — | Architecture doc, ADR 0001, Vite scaffold |
-| M2 | Core game implementation | implementer | done | M1 | Bugfix: S/Z SRS rotation shapes corrected |
+| M1 | Architecture & project structure | architect | pending | — | Architecture doc, ADR 0001, and Vite scaffold are not yet present |
+| M2 | Core game implementation | implementer | pending | M1 | Game source has not yet been implemented |
 | M3 | E2E test coverage | tester | pending | M2 | Browser tests for start, play, line clear, game over, restart |
 
 ## Active Assignments
@@ -32,6 +32,7 @@ _None._
 |------|--------|--------|
 | 2026-06-29 | Initial roadmap | Browser Tetris-like game project kickoff |
 | 2026-06-30 | Reopened M2 for bugfix | User report: green S piece wrong orientation when vertical |
+| 2026-07-24 | Reset M1 and M2 to pending | No architecture, app, or build deliverables exist in the repository |
 
 ## Completion Checklist
 

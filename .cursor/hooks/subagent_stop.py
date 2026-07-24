@@ -32,7 +32,11 @@ def main() -> int:
         return 0
 
     assignment_id = parse_assignment_id(task) or ""
-    action = "completed" if status == "completed" else "note"
+    # A host-level completed status means the subagent run ended, not that its
+    # assignment passed its acceptance criteria. The assignee must explicitly
+    # log `completed` after updating the assignment, which keeps audit gating
+    # tied to an intentional completion claim.
+    action = "note"
     summary = f"Subagent `{agent}` {status or 'stopped'}"
     if assignment_id:
         summary += f" for assignment `{assignment_id}`"
