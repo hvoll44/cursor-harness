@@ -1,0 +1,54 @@
+---
+description: Software Development Factory workspace rules — how agents use project-vision, roadmap, logging, and delegation
+alwaysApply: true
+---
+
+# Software Development Factory
+
+This repository runs as a **Software Development Factory**. Agents follow this workflow.
+
+## Artifacts
+
+| Artifact | Path | Purpose |
+|----------|------|---------|
+| Project vision | `factory/project-vision.md` | What the end result should look like |
+| Roadmap | `factory/roadmap.md` | How to achieve the vision; milestone tracking |
+| Assignments | `factory/assignments/*.md` | Scoped work packages for specialist agents |
+| Log | `factory/log/` | Append-only action log (all agents must log) |
+| Milestone paths | `factory/milestone-paths.json` | Paths locked when milestone status is `done` |
+
+## Hooks
+
+Factory hooks in `.cursor/hooks.json` enforce workflow automatically. Agents should still log via **factory-log** — hooks add a deterministic backstop.
+
+## Agent roles
+
+| Role | Subagent | Responsibility |
+|------|----------|----------------|
+| System | `/system` | Oversees project, delegates, tracks roadmap, adjusts plan |
+| Architect | `/architect` | Architecture and folder structure |
+| Implementer | `/implementer` | Application code and features |
+| Tester | `/tester` | Create and run e2e tests |
+| Auditor | `/auditor` | Verify assignments are truly complete |
+
+## Required behavior
+
+1. **Read vision + roadmap** before starting factory work
+2. **Log every significant action** using the **factory-log** skill (started, completed, delegated, blocked, adjusted)
+3. **Delegate heavy work** to specialists via subagents — preserve parent context
+4. **Never mark milestones done** without auditor `pass` on the related assignment
+5. **Subagents get full context in the prompt** — they have no conversation history
+6. **Git: commit locally, never push** — agents may `git commit`; `git push` is blocked by hook
+
+## Starting a project
+
+1. Fill in `factory/project-vision.md`
+2. Define milestones in `factory/roadmap.md`
+3. Invoke `/system` to plan and delegate the first assignments
+
+## Skills (deterministic tools)
+
+- **factory-log** — append structured log entries
+- **factory-delegate** — create assignments and delegation prompts
+- **factory-roadmap** — update milestone and assignment status
+- **factory-audit** — pre-audit checklist before invoking auditor
