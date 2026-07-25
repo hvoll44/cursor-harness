@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A visual guide to the Crew multi-agent delivery workflow.">
+  <title>Crew · Agent workflow</title>
+  <link rel="stylesheet" href="crew-visualization.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="hero">
+      <p class="eyebrow">CURSOR-NATIVE DELIVERY FRAMEWORK</p>
+      <h1>How the Crew works</h1>
+      <p class="lede">A system agent steers specialists through a traceable delivery loop: plan, delegate, build, verify, repeat.</p>
+    </header>
+
+    <section class="workflow" aria-labelledby="workflow-title">
+      <div class="section-heading">
+        <p class="section-number">01</p>
+        <div>
+          <p class="eyebrow">THE DELIVERY LOOP</p>
+          <h2 id="workflow-title">One coordinator, four focused roles</h2>
+        </div>
+      </div>
+
+      <div class="workflow-diagram">
+        <aside class="inputs" aria-label="Project inputs">
+          <article class="artifact-card vision">
+            <span class="card-icon">✦</span>
+            <div>
+              <h3>Project vision</h3>
+              <p>What “done” means</p>
+            </div>
+          </article>
+          <article class="artifact-card roadmap">
+            <span class="card-icon">↗</span>
+            <div>
+              <h3>Roadmap</h3>
+              <p>Milestones and sequence</p>
+            </div>
+          </article>
+        </aside>
+
+        <div class="connector input-connector" aria-hidden="true"></div>
+
+        <article class="agent-card system">
+          <div class="agent-topline">
+            <span class="role-tag">COORDINATOR</span>
+            <span class="agent-mark">S</span>
+          </div>
+          <h3>System</h3>
+          <p>Reads the vision and roadmap, selects the next task, delegates it, and tracks progress.</p>
+          <span class="command">/system</span>
+        </article>
+
+        <div class="specialist-area">
+          <div class="branch-line" aria-hidden="true"></div>
+          <div class="specialists">
+            <article class="agent-card architect">
+              <div class="agent-topline">
+                <span class="role-tag">DESIGN</span>
+                <span class="agent-mark">A</span>
+              </div>
+              <h3>Architect</h3>
+              <p>Defines structure and technical foundations.</p>
+              <span class="command">/architect</span>
+            </article>
+            <article class="agent-card implementer">
+              <div class="agent-topline">
+                <span class="role-tag">BUILD</span>
+                <span class="agent-mark">I</span>
+              </div>
+              <h3>Implementer</h3>
+              <p>Builds features within the approved scope.</p>
+              <span class="command">/implementer</span>
+            </article>
+            <article class="agent-card tester">
+              <div class="agent-topline">
+                <span class="role-tag">TEST</span>
+                <span class="agent-mark">T</span>
+              </div>
+              <h3>Tester</h3>
+              <p>Creates and runs end-to-end tests.</p>
+              <span class="command">/tester</span>
+            </article>
+          </div>
+          <div class="audit-path" aria-hidden="true"></div>
+          <article class="agent-card auditor">
+            <div class="agent-topline">
+              <span class="role-tag">VERIFY</span>
+              <span class="agent-mark">✓</span>
+            </div>
+            <h3>Auditor</h3>
+            <p>Checks that the assignment and its evidence meet the definition of done.</p>
+            <span class="command">/auditor</span>
+          </article>
+        </div>
+      </div>
+
+      <p class="diagram-note"><span></span>Each specialist’s assignment is independently verified before the System advances the milestone.</p>
+    </section>
+
+    <section class="detail-grid" aria-label="Workflow details">
+      <article class="panel sequence-panel">
+        <div class="section-heading compact">
+          <p class="section-number">02</p>
+          <div>
+            <p class="eyebrow">WHAT HAPPENS</p>
+            <h2>A milestone in motion</h2>
+          </div>
+        </div>
+        <ol class="sequence">
+          <li><span>01</span><div><strong>Frame the work</strong><p>Vision and roadmap give the System its context.</p></div></li>
+          <li><span>02</span><div><strong>Delegate an assignment</strong><p>A focused brief is handed to the right specialist.</p></div></li>
+          <li><span>03</span><div><strong>Produce evidence</strong><p>The specialist changes code, tests, or architecture and logs the outcome.</p></div></li>
+          <li><span>04</span><div><strong>Audit the result</strong><p>The Auditor passes or returns the assignment for correction.</p></div></li>
+          <li><span>05</span><div><strong>Advance deliberately</strong><p>Only a verified assignment moves the roadmap forward.</p></div></li>
+        </ol>
+      </article>
+
+      <article class="panel trail-panel">
+        <div class="section-heading compact">
+          <p class="section-number">03</p>
+          <div>
+            <p class="eyebrow">THE PAPER TRAIL</p>
+            <h2>Everything leaves a trace</h2>
+          </div>
+        </div>
+        <div class="trail">
+          <div class="trail-item"><span class="trail-icon">◎</span><div><h3>Assignments</h3><p>Scoped work packages define who owns what.</p><code>factory/assignments/</code></div></div>
+          <div class="trail-item"><span class="trail-icon">≡</span><div><h3>Action logs</h3><p>Starts, handoffs, completions, and audit results are append-only.</p><code>factory/log/</code></div></div>
+          <div class="trail-item"><span class="trail-icon">⌁</span><div><h3>Hooks</h3><p>Automation records messages, enforces audit gates, and protects completed work.</p><code>.cursor/hooks.json</code></div></div>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <span class="footer-mark">CREW</span>
+      <p>Human direction → structured agent collaboration → verified progress</p>
+    </footer>
+  </main>
+</body>
+</html>
