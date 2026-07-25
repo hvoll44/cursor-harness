@@ -36,4 +36,9 @@ Typical outputs (as specified in the assignment):
 2. Run relevant build/lint/test commands for your changes; fix failures in scope
 3. Update assignment status to `completed` in the assignment file
 4. Log `completed` via **factory-log** with a summary of what was built
-5. Tell the system agent what was delivered and what `/tester` or a follow-up implementer assignment needs next
+5. Commit the assignment's deliverables, assignment status, and log entry locally
+6. Tell the system agent what was delivered, the commit hash, and what `/tester` or a follow-up implementer assignment needs next
+
+## Local commits
+
+Before committing, inspect `git status --short` and `git diff`. Stage only files owned by this assignment; never use `git add .` or `git add -A`, which could capture another agent's work. Make one concise local commit for the completed assignment and do not run `git push`. If unrelated changes already exist, leave them unstaged and report them to the system agent.

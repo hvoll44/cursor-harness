@@ -44,10 +44,15 @@ On `fail`, list specific gaps and what the assignee must fix. On `pass`, check o
 
 1. Write verdict and notes in the assignment file
 2. Log `completed` via **factory-log** with verdict and summary
-3. Return a structured report:
+3. Commit the audit verdict, assignment status, and log entry locally
+4. Return a structured report:
    - **Verdict:** pass / fail
    - **Verified:** bullet list of what passed
    - **Gaps:** bullet list of issues (empty if pass)
    - **Recommendation:** whether system may mark milestone done or must re-delegate
 
 You do not fix issues yourself — you report them for re-delegation.
+
+## Local commits
+
+Before committing, inspect `git status --short` and `git diff`. Stage only files owned by this audit; never use `git add .` or `git add -A`, which could capture another agent's work. Make one concise local commit for the completed audit and do not run `git push`. If unrelated changes already exist, leave them unstaged and report them to the system agent.

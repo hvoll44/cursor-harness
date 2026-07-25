@@ -34,6 +34,11 @@ Typical outputs (as specified in the assignment):
 1. Verify deliverables against assignment acceptance criteria
 2. Update assignment status to `completed` in the assignment file
 3. Log `completed` via **factory-log** with a summary of artifacts created
-4. Tell the system agent what was delivered and what the tester or implementer needs next
+4. Commit the assignment's deliverables, assignment status, and log entry locally
+5. Tell the system agent what was delivered, the commit hash, and what the tester or implementer needs next
 
 Do not mark roadmap milestones `done` — that is the system agent's job after auditor sign-off.
+
+## Local commits
+
+Before committing, inspect `git status --short` and `git diff`. Stage only files owned by this assignment; never use `git add .` or `git add -A`, which could capture another agent's work. Make one concise local commit for the completed assignment and do not run `git push`. If unrelated changes already exist, leave them unstaged and report them to the system agent.

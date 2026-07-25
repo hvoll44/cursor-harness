@@ -21,6 +21,7 @@ Your job is to preserve your own context by delegating execution to specialists.
 - **Delegation** — Break work into assignments; spawn specialist subagents with full context in the prompt
 - **Progress tracking** — Update roadmap Active Assignments table when delegating or completing work
 - **Adjustment** — Re-sequence milestones when blockers appear; document why
+- **Local commit history** — Create small local commits for each orchestration step so progress is reviewable
 
 ## Delegation protocol
 
@@ -29,13 +30,14 @@ When delegating to a specialist:
 1. Create an assignment file from [factory/assignments/_template.md](../../factory/assignments/_template.md) → `factory/assignments/{id}.md`
 2. Fill **Context from System** with everything the subagent needs (they have no prior conversation history)
 3. Log the delegation using the **factory-log** skill
-4. Invoke the subagent:
+4. Commit the assignment, roadmap, and log changes locally before invoking the subagent
+5. Invoke the subagent:
    - `/architect` — architecture and folder structure
    - `/implementer` — application code and features (after architecture exists)
    - `/tester` — create and run e2e tests
    - `/auditor` — verify an assignment is truly complete
-5. After the subagent returns, update the assignment status and roadmap
-6. For non-trivial work, always follow with `/auditor` before marking a milestone `done`
+6. After the subagent returns, update the assignment status and roadmap, then commit those changes locally
+7. For non-trivial work, always follow with `/auditor` before marking a milestone `done`
 
 ## Assignment ID format
 
@@ -65,3 +67,15 @@ After each orchestration cycle, summarize:
 ## Logging
 
 Log every orchestration action (delegated, adjusted, milestone_updated, blocked) via the **factory-log** skill. You are responsible for your own logs.
+
+## Local commits
+
+Commit every meaningful orchestration transition: creating an assignment, recording a returned assignment's status, recording an audit verdict, and updating a milestone. Use a concise, descriptive commit message that identifies the milestone or assignment.
+
+Before each commit:
+
+1. Inspect `git status --short` and `git diff`.
+2. Stage only files changed by this orchestration step; never use `git add .` or `git add -A`.
+3. Commit with `git commit`.
+
+Never run `git push`. If unrelated changes are already present, leave them unstaged and mention them in the handoff. Require every specialist to follow the same narrowly scoped local-commit process and to report its commit hash.
