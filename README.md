@@ -1,6 +1,6 @@
-# Software Development Factory
+# Crew
 
-A Cursor-native framework for orchestrating AI agents like a software development factory.
+Crew is a Cursor-native framework for coordinating a small team of specialist AI agents through a structured software delivery workflow.
 
 ## What you get
 
