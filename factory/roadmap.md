@@ -6,12 +6,18 @@
 
 ## Current Phase
 
+Planning — the project vision is defined and M1 is ready for architectural
+delegation.
 
 ## Milestones
 
 | ID | Milestone | Owner | Status | Depends On | Notes |
 |----|-----------|-------|--------|------------|-------|
-| _none_ | — | — | — | — | - |
+| M1 | Architecture and application foundation | Architect | pending | — | Select the browser stack; document modules, game-state boundaries, test tooling, and GitHub Pages deployment approach. |
+| M2 | Core Tetris game engine | Implementer | pending | M1 | Implement deterministic board, tetromino, movement, rotation, collision, line clearing, scoring, levels, and game-over logic with automated unit tests. |
+| M3 | Responsive playable game experience | Implementer | pending | M1, M2 | Build the accessible game UI, start/pause/restart flows, score and next-piece panels, desktop keyboard input, and touch controls. |
+| M4 | Static deployment and end-to-end coverage | Tester | pending | M2, M3 | Add a browser-level happy-path test, verify responsive behavior, and validate production builds and GitHub Pages deployment configuration. |
+| M5 | Release audit and GitHub Pages launch | System | pending | M4 | Obtain final audit approval, enable the configured GitHub Pages workflow, and verify the published URL. |
 
 ## Active Assignments
 
@@ -27,7 +33,7 @@ _None._
 
 | Date | Change | Reason |
 |------|--------|--------|
-| _none_ | — | — |
+| 2026-07-25 | Created M1–M5 delivery sequence | Establishes architecture-first delivery, then game logic, player experience, validation, and release. |
 
 
 ## Completion Checklist
