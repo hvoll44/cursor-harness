@@ -42,7 +42,8 @@ When `architect`, `implementer`, or `tester` completes, returns a `followup_mess
 Denies `/auditor` unless:
 
 - Assignment file exists with status `completed`
-- `factory/log/` contains both `started` and `completed` for that assignment ID
+- `factory/log/` contains a `delegated` entry from `system`, plus `started` and
+  `completed` entries from the assignment's declared specialist agent
 
 ### 5 — Inject session context
 
@@ -60,7 +61,8 @@ Blocks file edits under path prefixes listed in `factory/milestone-paths.json` f
 
 Exempt paths: `factory/`, `.cursor/`, `.git/`
 
-Override: mention `reopen`, `hotfix`, `rework`, or `fix done` in the agent message.
+To reopen protected work, `/system` must move the milestone out of `done` in
+`factory/roadmap.md`, log the adjustment, and delegate a rework assignment.
 
 ### 7 — Warn on out-of-scope edits
 
@@ -75,6 +77,10 @@ After a write, injects `additional_context` if the file is outside paths declare
 **Script:** `block_git_push.py`
 
 Blocks any `git push` command (including `git push origin`, `git push -u origin main`, `--force`, etc.). Local git operations such as `git add`, `git commit`, `git status`, and `git diff` remain allowed.
+
+This is a workflow control, not a security boundary: Git aliases, wrappers, or
+other tools that push without executing a detectable Git push command may not
+be intercepted.
 
 ### 9 — Log agent messages
 

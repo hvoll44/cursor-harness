@@ -9,15 +9,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from factory_lib import (
-    assignment_has_logs,
+    assignment_lifecycle_ready,
     assignment_path,
     detect_factory_agent,
     emit,
     has_assignment_context,
-    parse_assignment_id,
     read_assignment_status,
     read_stdin_json,
     repo_root,
+    resolve_assignment_id,
     run_log,
     run_log_message,
 )
@@ -34,7 +34,7 @@ def main() -> int:
         emit({"permission": "allow"})
         return 0
 
-    assignment_id = parse_assignment_id(task)
+    assignment_id = resolve_assignment_id(task)
 
     # Hook 4: Gate auditor invocation
     if agent == "auditor":
@@ -64,12 +64,14 @@ def main() -> int:
             )
             return 0
 
-        if not assignment_has_logs(root, assignment_id, "started", "completed"):
+        lifecycle_ready, reason = assignment_lifecycle_ready(root, assignment_id)
+        if not lifecycle_ready:
             emit(
                 {
                     "permission": "deny",
                     "user_message": (
-                        f"Auditor blocked: `{assignment_id}` missing `started` or "
+                        f"Auditor blocked: `{assignment_id}` {reason}. "
+                        "Require system delegation plus assignee `started` and "
                         "`completed` entries in factory/log/."
                     ),
                 }

@@ -8,11 +8,16 @@ import os
 import subprocess
 import sys
 import tempfile
+from contextlib import redirect_stderr
+from io import StringIO
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HOOKS = ROOT / ".cursor" / "hooks"
 WORKSPACE_ROOT = ROOT
+sys.path.insert(0, str(HOOKS))
+
+import factory_lib
 
 
 def run_hook(script: str, payload: dict) -> dict:
@@ -28,11 +33,61 @@ def run_hook(script: str, payload: dict) -> dict:
     return json.loads(out) if out else {}
 
 
+def write_assignment(assignment_id: str, agent: str, status: str = "completed"):
+    path = WORKSPACE_ROOT / "factory" / "assignments" / f"{assignment_id}.md"
+    path.write_text(
+        "| Field | Value |\n"
+        "|-------|-------|\n"
+        f"| **Agent** | `{agent}` |\n"
+        f"| **Status** | `{status}` |\n",
+        encoding="utf-8",
+    )
+
+
+def write_log_entries(*entries: dict):
+    log = WORKSPACE_ROOT / "factory" / "log" / "events.jsonl"
+    log.parent.mkdir(parents=True, exist_ok=True)
+    log.write_text(
+        "\n".join(json.dumps(entry) for entry in entries) + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_done_milestone(status: str = "done"):
+    (WORKSPACE_ROOT / "factory" / "roadmap.md").write_text(
+        "## Milestones\n\n"
+        "| ID | Milestone | Owner | Status |\n"
+        "|----|-----------|-------|--------|\n"
+        f"| M1 | Test | implementer | {status} |\n",
+        encoding="utf-8",
+    )
+    (WORKSPACE_ROOT / "factory" / "milestone-paths.json").write_text(
+        json.dumps({"M1": ["src/"]}),
+        encoding="utf-8",
+    )
+
+
 def test_session_start():
     out = run_hook("session_start.py", {})
     assert "additional_context" in out
     assert "Software Development Factory" in out["additional_context"]
     print("session_start: ok")
+
+
+def test_session_start_skips_placeholder_templates():
+    (WORKSPACE_ROOT / "factory" / "project-vision.md").write_text(
+        "## Summary\n\n## Success Criteria\n\n", encoding="utf-8"
+    )
+    (WORKSPACE_ROOT / "factory" / "roadmap.md").write_text(
+        "## Milestones\n\n"
+        "| ID | Milestone | Owner | Status |\n"
+        "|----|-----------|-------|--------|\n"
+        "| _none_ | — | — | — |\n",
+        encoding="utf-8",
+    )
+    out = run_hook("session_start.py", {})
+    assert out == {}
+    print("session_start placeholder: ok")
 
 
 def test_subagent_start_denies_missing_assignment():
@@ -59,6 +114,42 @@ def test_subagent_start_allows_with_assignment():
     print("subagent_start allow: ok")
 
 
+def test_auditor_denies_wrong_agent_logs():
+    assignment_id = "implementer-M1-01"
+    write_assignment(assignment_id, "implementer")
+    write_log_entries(
+        {"agent": "system", "action": "delegated", "assignment_id": assignment_id},
+        {"agent": "system", "action": "started", "assignment_id": assignment_id},
+        {"agent": "system", "action": "completed", "assignment_id": assignment_id},
+    )
+    out = run_hook(
+        "subagent_start.py",
+        {"task": f"Audit {assignment_id}", "subagent_type": "auditor"},
+    )
+    assert out.get("permission") == "deny"
+    assert "assignee" in out.get("user_message", "")
+    print("auditor denies wrong agent logs: ok")
+
+
+def test_auditor_allows_assignee_lifecycle():
+    assignment_id = "implementer-M1-02"
+    write_assignment(assignment_id, "implementer")
+    write_log_entries(
+        {"agent": "system", "action": "delegated", "assignment_id": assignment_id},
+        {"agent": "implementer", "action": "started", "assignment_id": assignment_id},
+        {"agent": "implementer", "action": "completed", "assignment_id": assignment_id},
+    )
+    out = run_hook(
+        "subagent_start.py",
+        {
+            "task": f"Assignment: factory/assignments/{assignment_id}.md",
+            "subagent_type": "auditor",
+        },
+    )
+    assert out.get("permission") == "allow"
+    print("auditor allows assignee lifecycle: ok")
+
+
 def test_subagent_stop_followup():
     out = run_hook(
         "subagent_stop.py",
@@ -70,11 +161,17 @@ def test_subagent_stop_followup():
     )
     assert "followup_message" in out
     assert "/auditor" in out["followup_message"]
-    log_text = "\n".join(
-        path.read_text(encoding="utf-8")
+    entries = [
+        json.loads(line)
         for path in (WORKSPACE_ROOT / "factory" / "log").glob("*.jsonl")
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert not any(
+        entry.get("assignment_id") == "architect-M2-01"
+        and entry.get("action") == "completed"
+        for entry in entries
     )
-    assert '"action": "completed"' not in log_text
     print("subagent_stop followup: ok")
 
 
@@ -88,6 +185,59 @@ def test_protect_done_milestones_allows_unprotected():
     )
     assert out.get("permission") == "allow"
     print("protect_done allow: ok")
+
+
+def test_protect_done_milestones_denies_hotfix_phrase():
+    write_done_milestone()
+    out = run_hook(
+        "protect_done_milestones.py",
+        {
+            "tool_name": "Write",
+            "tool_input": {"path": str(WORKSPACE_ROOT / "src" / "protected.py")},
+            "agent_message": "Apply a hotfix to this completed work.",
+        },
+    )
+    assert out.get("permission") == "deny"
+    print("protect_done denies hotfix phrase: ok")
+
+
+def test_protect_done_milestones_allows_reopened_milestone():
+    write_done_milestone("in_progress")
+    out = run_hook(
+        "protect_done_milestones.py",
+        {
+            "tool_name": "Write",
+            "tool_input": {"path": str(WORKSPACE_ROOT / "src" / "reworked.py")},
+        },
+    )
+    assert out.get("permission") == "allow"
+    print("protect_done allows reopened milestone: ok")
+
+
+def test_scope_parser_uses_structure_section_only():
+    architecture = WORKSPACE_ROOT / "docs" / "architecture.md"
+    architecture.parent.mkdir(parents=True, exist_ok=True)
+    architecture.write_text(
+        "# Architecture\n\n"
+        "Unrelated reference: `orphan/pkg`.\n\n"
+        "## Folder Structure\n\n"
+        "```text\n"
+        "└── src/app/\n"
+        "```\n\n"
+        "## Interfaces\n\n"
+        "Also unrelated: `other/pkg`.\n",
+        encoding="utf-8",
+    )
+    assert factory_lib.parse_architecture_paths(WORKSPACE_ROOT) == ["src/app"]
+    out = run_hook(
+        "warn_out_of_scope.py",
+        {
+            "tool_name": "Write",
+            "tool_input": {"path": str(WORKSPACE_ROOT / "orphan" / "pkg" / "x.py")},
+        },
+    )
+    assert "additional_context" in out
+    print("scope parser section only: ok")
 
 
 def test_block_git_push_denies():
@@ -106,6 +256,32 @@ def test_block_git_push_allows_commit():
     )
     assert out.get("permission") == "allow"
     print("block_git_push allow commit: ok")
+
+
+def test_block_git_push_denies_global_option():
+    out = run_hook(
+        "block_git_push.py",
+        {"command": "git -C ../other push origin main"},
+    )
+    assert out.get("permission") == "deny"
+    print("block_git_push global option: ok")
+
+
+def test_run_log_reports_failure():
+    previous_script = factory_lib.LOG_SCRIPT
+    failing_script = WORKSPACE_ROOT / "failing_log.py"
+    failing_script.write_text("import sys; sys.exit(1)\n", encoding="utf-8")
+    factory_lib.LOG_SCRIPT = failing_script
+    stderr = StringIO()
+    try:
+        with redirect_stderr(stderr):
+            assert not factory_lib.run_log(
+                WORKSPACE_ROOT, "system", "note", "Expected failing log"
+            )
+    finally:
+        factory_lib.LOG_SCRIPT = previous_script
+    assert "factory-log failed" in stderr.getvalue()
+    print("run_log failure reporting: ok")
 
 
 def test_subagent_stop_followup_implementer():
@@ -208,8 +384,11 @@ def main() -> int:
         )
         tests = [
             test_session_start,
+            test_session_start_skips_placeholder_templates,
             test_subagent_start_denies_missing_assignment,
             test_subagent_start_allows_with_assignment,
+            test_auditor_denies_wrong_agent_logs,
+            test_auditor_allows_assignee_lifecycle,
             test_subagent_stop_followup,
             test_subagent_stop_followup_implementer,
             test_log_task_delegation,
@@ -218,8 +397,13 @@ def main() -> int:
             test_log_agent_response_logs_factory,
             test_view_messages_script,
             test_protect_done_milestones_allows_unprotected,
+            test_protect_done_milestones_denies_hotfix_phrase,
+            test_protect_done_milestones_allows_reopened_milestone,
+            test_scope_parser_uses_structure_section_only,
             test_block_git_push_denies,
             test_block_git_push_allows_commit,
+            test_block_git_push_denies_global_option,
+            test_run_log_reports_failure,
         ]
         for test in tests:
             test()

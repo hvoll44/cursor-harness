@@ -13,7 +13,8 @@ Assignment file exists at `factory/assignments/{id}.md` with:
 
 - [ ] **Status** set to `completed` by assignee
 - [ ] All **Deliverables** listed and present on disk
-- [ ] Assignee logged `started` and `completed` in `factory/log/`
+- [ ] System logged `delegated`, and the declared assignee logged `started` and
+  `completed`, in `factory/log/`
 
 ## Quick self-check (system agent)
 

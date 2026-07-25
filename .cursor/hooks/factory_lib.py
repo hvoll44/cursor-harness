@@ -66,6 +66,14 @@ def parse_assignment_id(text: str) -> str | None:
     return match.group(0) if match else None
 
 
+def resolve_assignment_id(text: str) -> str | None:
+    assignment_id = parse_assignment_id(text)
+    if assignment_id:
+        return assignment_id
+    match = ASSIGNMENT_PATH_RE.search(text)
+    return Path(match.group(0)).stem if match else None
+
+
 def has_assignment_context(text: str) -> bool:
     if ASSIGNMENT_PATH_RE.search(text):
         return True
@@ -81,6 +89,14 @@ def read_assignment_status(path: Path) -> str | None:
         return None
     content = path.read_text(encoding="utf-8")
     match = re.search(r"\*\*Status\*\*\s*\|\s*`(\w+)`", content)
+    return match.group(1).lower() if match else None
+
+
+def read_assignment_agent(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    content = path.read_text(encoding="utf-8")
+    match = re.search(r"\*\*Agent\*\*\s*\|\s*`(\w+)`", content)
     return match.group(1).lower() if match else None
 
 
@@ -183,6 +199,8 @@ def parse_architecture_paths(root: Path) -> list[str]:
             continue
         if in_structure and re.match(r"^#+\s", line) and "structure" not in line.lower():
             in_structure = False
+        if not in_structure:
+            continue
         candidates = re.findall(r"`([^`]+)`", line)
         candidates += re.findall(r"(?:├──|└──|[-*])\s+([^\s│]+)", line)
         for raw in candidates:
@@ -230,6 +248,39 @@ def assignment_has_logs(root: Path, assignment_id: str, *actions: str) -> bool:
     return required.issubset(found)
 
 
+def assignment_lifecycle_ready(root: Path, assignment_id: str) -> tuple[bool, str]:
+    path = assignment_path(root, assignment_id)
+    assignee = read_assignment_agent(path)
+    if assignee not in {"architect", "implementer", "tester"}:
+        return False, "assignment has no valid specialist assignee"
+
+    log_dir = root / "factory" / "log"
+    if not log_dir.is_dir():
+        return False, "factory/log is missing"
+
+    delegated = False
+    lifecycle: set[str] = set()
+    for log_file in sorted(log_dir.glob("*.jsonl")):
+        for line in log_file.read_text(encoding="utf-8").splitlines():
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if entry.get("assignment_id") != assignment_id:
+                continue
+            if entry.get("agent") == "system" and entry.get("action") == "delegated":
+                delegated = True
+            if entry.get("agent") == assignee and entry.get("action") in {"started", "completed"}:
+                lifecycle.add(entry["action"])
+
+    if not delegated:
+        return False, "missing system delegated log"
+    missing = {"started", "completed"} - lifecycle
+    if missing:
+        return False, f"missing {', '.join(sorted(missing))} log from assignee `{assignee}`"
+    return True, ""
+
+
 def parse_tool_input(data: dict) -> dict:
     tool_input = data.get("tool_input") or {}
     if isinstance(tool_input, str):
@@ -267,7 +318,7 @@ def run_log(
     assignment_id: str = "",
     milestone: str = "",
     details: dict | None = None,
-) -> None:
+) -> bool:
     cmd = [
         sys.executable,
         str(LOG_SCRIPT),
@@ -284,13 +335,23 @@ def run_log(
         cmd.extend(["--milestone", milestone])
     if details:
         cmd.extend(["--details", json.dumps(details, ensure_ascii=False)])
-    subprocess.run(
-        cmd,
-        cwd=root,
-        check=False,
-        capture_output=True,
-        env={**os.environ, "FACTORY_ROOT": str(root)},
-    )
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "FACTORY_ROOT": str(root)},
+        )
+    except OSError as error:
+        print(f"factory-log failed to start: {error}", file=sys.stderr)
+        return False
+    if result.returncode:
+        detail = result.stderr.strip() or result.stdout.strip() or "no output"
+        print(f"factory-log failed ({result.returncode}): {detail}", file=sys.stderr)
+        return False
+    return True
 
 
 def run_log_message(
@@ -305,7 +366,7 @@ def run_log_message(
     assignment_id: str = "",
     milestone: str = "",
     details: dict | None = None,
-) -> None:
+) -> bool:
     cmd = [
         sys.executable,
         str(LOG_SCRIPT),
@@ -330,13 +391,23 @@ def run_log_message(
         cmd.extend(["--milestone", milestone])
     if details:
         cmd.extend(["--details", json.dumps(details, ensure_ascii=False)])
-    subprocess.run(
-        cmd,
-        cwd=root,
-        check=False,
-        capture_output=True,
-        env={**os.environ, "FACTORY_ROOT": str(root)},
-    )
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "FACTORY_ROOT": str(root)},
+        )
+    except OSError as error:
+        print(f"factory-log failed to start: {error}", file=sys.stderr)
+        return False
+    if result.returncode:
+        detail = result.stderr.strip() or result.stdout.strip() or "no output"
+        print(f"factory-log failed ({result.returncode}): {detail}", file=sys.stderr)
+        return False
+    return True
 
 
 def read_roadmap_summary(root: Path) -> str:
@@ -347,14 +418,14 @@ def read_roadmap_summary(root: Path) -> str:
     if vision.is_file():
         vision_text = vision.read_text(encoding="utf-8")
         summary_match = re.search(
-            r"## Summary\s*\n+([\s\S]*?)(?=\n## |\Z)", vision_text
+            r"(?ms)^## Summary[ \t]*\n(.*?)(?=^## |\Z)", vision_text
         )
         if summary_match:
             parts.append("### Vision Summary\n" + summary_match.group(1).strip())
 
     if roadmap.is_file():
         content = roadmap.read_text(encoding="utf-8")
-        phase = re.search(r"## Current Phase\s*\n+([\s\S]*?)(?=\n## |\Z)", content)
+        phase = re.search(r"(?ms)^## Current Phase[ \t]*\n(.*?)(?=^## |\Z)", content)
         if phase:
             parts.append("### Current Phase\n" + phase.group(1).strip())
 
@@ -365,7 +436,7 @@ def read_roadmap_summary(root: Path) -> str:
                 lines.append(f"- **{mid}**: `{status}`")
             parts.append("\n".join(lines))
 
-        blockers = re.search(r"## Blockers\s*\n+([\s\S]*?)(?=\n## |\Z)", content)
+        blockers = re.search(r"(?ms)^## Blockers[ \t]*\n(.*?)(?=^## |\Z)", content)
         if blockers and "_None_" not in blockers.group(1):
             parts.append("### Blockers\n" + blockers.group(1).strip())
 
@@ -382,3 +453,34 @@ def read_roadmap_summary(root: Path) -> str:
                 parts.append("### Active Assignments\n" + "\n".join(rows[1:]))
 
     return "\n\n".join(parts)
+
+
+def has_substantive_factory_context(root: Path) -> bool:
+    vision = root / "factory" / "project-vision.md"
+    if vision.is_file():
+        vision_text = vision.read_text(encoding="utf-8")
+        summary = re.search(
+            r"(?ms)^## Summary[ \t]*\n(.*?)(?=^## |\Z)", vision_text
+        )
+        if summary and summary.group(1).strip():
+            return True
+
+    statuses = parse_milestone_statuses(root)
+    if statuses:
+        return True
+
+    roadmap = root / "factory" / "roadmap.md"
+    if roadmap.is_file():
+        content = roadmap.read_text(encoding="utf-8")
+        active = re.search(
+            r"## Active Assignments\s*\n+\|[\s\S]*?\n(\|[^\n]+\n)+", content
+        )
+        if active and any(
+            row.startswith("|")
+            and "_none_" not in row.lower()
+            and "Assignment ID" not in row
+            and "---" not in row
+            for row in active.group(0).splitlines()
+        ):
+            return True
+    return False

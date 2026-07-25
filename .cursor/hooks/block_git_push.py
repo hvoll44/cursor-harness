@@ -7,8 +7,14 @@ import json
 import re
 import sys
 
-# git push, including: push origin, push -u origin, push --force, bare "git push"
-GIT_PUSH_RE = re.compile(r"\bgit\s+push\b", re.IGNORECASE)
+# Git global options may appear before the subcommand, for example:
+# git -C other push, git -c advice.detachedHead=false push, or git.exe push.
+GIT_PUSH_RE = re.compile(
+    r"\bgit(?:\.exe)?"
+    r"(?:\s+(?:-C|-c|--git-dir|--work-tree)(?:=|\s+)\S+)*"
+    r"\s+push\b",
+    re.IGNORECASE,
+)
 
 
 def is_blocked_push(command: str) -> bool:
