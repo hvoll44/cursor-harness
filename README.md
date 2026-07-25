@@ -119,9 +119,10 @@ Project hooks in [.cursor/hooks.json](.cursor/hooks.json) automate factory enfor
 | Require assignment | `subagentStart` | Blocks `/architect`, `/implementer`, and `/tester` without assignment context |
 | Gate auditor | `subagentStart` | Blocks `/auditor` unless assignment is `completed` with logs |
 | Chain auditor | `subagentStop` | Follow-up to run `/auditor` after architect/implementer/tester completes |
-| Session context | `sessionStart` | Injects vision summary and roadmap milestones |
-| Protect done work | `preToolUse` | Blocks edits to paths under `done` milestones |
-| Scope warning | `postToolUse` | Warns when edits fall outside `docs/architecture.md` structure |
+| Session context | `sessionStart` | Injects vision summary and roadmap milestones when enough context is available |
+| Protect done work | `preToolUse` | Blocks writes, deletes, and in-file replacements under `done` milestones |
+| Scope warning | `postToolUse` | After `docs/architecture.md` declares paths, warns about edits outside its folder-structure section |
+| Block git push | `beforeShellExecution` / `git push` | Blocks remote pushes; local commits remain allowed |
 
 When a milestone is marked `done`, add its path prefixes to [factory/milestone-paths.json](factory/milestone-paths.json).
 

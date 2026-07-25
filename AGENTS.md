@@ -70,10 +70,11 @@ Configured in [.cursor/hooks.json](.cursor/hooks.json). See [.cursor/hooks/READM
 | 2 | `subagentStart` | Require assignment context for architect/implementer/tester |
 | 3 | `subagentStop` | Follow-up to invoke `/auditor` after specialist completes |
 | 4 | `subagentStart` | Gate `/auditor` until assignment completed + logged |
-| 5 | `sessionStart` | Inject vision and roadmap into session context |
-| 6 | `preToolUse` | Block writes to paths under done milestones; log Task delegations |
-| 7 | `postToolUse` | Warn on out-of-scope edits; log Task tool results |
+| 5 | `sessionStart` | Inject vision and roadmap context when enough content is available |
+| 6 | `preToolUse` | Block writes, deletes, and replacements under done milestones; log Task delegations |
+| 7 | `postToolUse` | After the architecture doc declares paths, warn on out-of-scope edits; log Task tool results |
 | 8 | `afterAgentResponse` | Log factory-related assistant responses |
+| 9 | `beforeShellExecution` / `git push` | Block remote pushes; local commits remain allowed |
 
 ## Skills (deterministic tools)
 
@@ -112,7 +113,7 @@ python .cursor/skills/factory-log/scripts/log-action.py \
   --summary "Delegated initial architecture"
 ```
 
-Logs append to `factory/log/YYYY-MM-DD.jsonl`. Message bodies are stored in `factory/log/messages/`. View the thread:
+Logs append to `factory/log/YYYY-MM-DD.jsonl`. Message bodies are stored in `factory/log/messages/YYYY-MM-DD/`. View the thread:
 
 ```bash
 python .cursor/skills/factory-log/scripts/view-messages.py
