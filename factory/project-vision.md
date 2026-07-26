@@ -1,6 +1,6 @@
 # Project Vision
 
-> What the end result should look like. The system agent reads this before delegating work and uses it to judge whether the project is on track.
+> What the end result should look like. The Foreman reads this before delegating work and uses it to judge whether the project is on track.
 
 ## Summary
 

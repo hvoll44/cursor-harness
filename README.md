@@ -4,7 +4,7 @@ Crew is a Cursor-native framework for coordinating a small team of specialist AI
 
 ## What you get
 
-- **System agent** — High-level overseer that delegates work and preserves its own context
+- **Foreman** — High-level overseer that delegates work and preserves its own context
 - **Specialist agents** — Architect, Implementer, Tester, and Auditor with focused responsibilities
 - **Living artifacts** — Project vision, roadmap, assignments, and action logs
 - **Deterministic skills** — Logging, delegation, roadmap updates, and audit checklists
@@ -18,7 +18,7 @@ Crew is a Cursor-native framework for coordinating a small team of specialist AI
 4. Open Cursor Agent and run:
 
    ```
-   /system
+   /foreman
 
    Read factory/project-vision.md and factory/roadmap.md.
    Delegate the first milestone to the appropriate specialist.
@@ -39,7 +39,7 @@ your-project/
     ├── hooks.json            # Factory automation hooks
     ├── hooks/                # Hook scripts (Python)
     ├── agents/               # Subagent definitions
-    │   ├── system.md
+    │   ├── foreman.md
     │   ├── architect.md
     │   ├── implementer.md
     │   ├── tester.md
@@ -57,7 +57,7 @@ your-project/
 
 | Agent | Responsibility |
 |-------|----------------|
-| **System** | Tracks roadmap, delegates to specialists, adjusts plan |
+| **Foreman** | Tracks roadmap, delegates to specialists, adjusts plan |
 | **Architect** | System design and folder structure |
 | **Implementer** | Application code and features |
 | **Tester** | End-to-end test creation and execution |
@@ -68,7 +68,7 @@ your-project/
 ```
 Vision + Roadmap
       ↓
-   /system  ──delegates──→  /architect  (design)
+   /foreman ──delegates──→  /architect  (design)
       │                         ↓
       │                    /auditor  (verify)
       │                         ↓

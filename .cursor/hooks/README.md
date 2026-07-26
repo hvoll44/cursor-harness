@@ -13,7 +13,7 @@ Project hooks for the Software Development Factory. Configured in [hooks.json](.
 **Events:** `subagentStart`, `subagentStop`  
 **Script:** `subagent_start.py`, `subagent_stop.py`
 
-Detects factory agents (`system`, `architect`, `implementer`, `tester`, `auditor`) and appends entries to `factory/log/` via `log-action.py`.
+Detects factory agents (`foreman`, `architect`, `implementer`, `tester`, `auditor`) and appends entries to `factory/log/` via `log-action.py`.
 
 ### 2 — Require assignment context
 
@@ -25,7 +25,7 @@ Denies `/architect`, `/implementer`, and `/tester` unless the task prompt includ
 - `factory/assignments/<id>.md`, or
 - An assignment ID matching `implementer-M2-01` pattern
 
-`/system` is exempt (it creates assignments).
+`/foreman` is exempt (it creates assignments).
 
 ### 3 — Chain auditor after specialist completes
 
@@ -42,7 +42,7 @@ When `architect`, `implementer`, or `tester` completes, returns a `followup_mess
 Denies `/auditor` unless:
 
 - Assignment file exists with status `completed`
-- `factory/log/` contains a `delegated` entry from `system`, plus `started` and
+- `factory/log/` contains a `delegated` entry from `foreman`, plus `started` and
   `completed` entries from the assignment's declared specialist agent
 
 ### 5 — Inject session context
@@ -61,7 +61,7 @@ Blocks file edits under path prefixes listed in `factory/milestone-paths.json` f
 
 Exempt paths: `factory/`, `.cursor/`, `.git/`
 
-To reopen protected work, `/system` must move the milestone out of `done` in
+To reopen protected work, `/foreman` must move the milestone out of `done` in
 `factory/roadmap.md`, log the adjustment, and delegate a rework assignment.
 
 ### 7 — Warn on out-of-scope edits

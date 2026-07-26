@@ -22,7 +22,7 @@ python .cursor/skills/factory-log/scripts/log-action.py \
 
 ```powershell
 python .cursor/skills/factory-log/scripts/log-action.py `
-  --agent system `
+  --agent foreman `
   --action delegated `
   --assignment-id architect-M2-01 `
   --milestone M2 `
@@ -33,7 +33,7 @@ python .cursor/skills/factory-log/scripts/log-action.py `
 
 | Flag | Required | Values |
 |------|----------|--------|
-| `--agent` | yes | `system`, `architect`, `implementer`, `tester`, `auditor`, `user` |
+| `--agent` | yes | `foreman`, `architect`, `implementer`, `tester`, `auditor`, `user` |
 | `--action` | yes | `started`, `completed`, `delegated`, `blocked`, `adjusted`, `milestone_updated`, `audited`, `note`, `message` |
 | `--summary` | yes | One-line description |
 | `--assignment-id` | no | e.g. `architect-M2-01` |
@@ -52,9 +52,9 @@ Use `--action message` to record agent-to-agent communication. Full bodies are s
 
 ```powershell
 python .cursor/skills/factory-log/scripts/log-action.py `
-  --agent system `
+  --agent foreman `
   --action message `
-  --from-agent system `
+  --from-agent foreman `
   --to-agent architect `
   --kind delegation `
   --assignment-id architect-M3-01 `
@@ -89,10 +89,10 @@ Appends one JSON line to `factory/log/YYYY-MM-DD.jsonl` and prints the path and 
 |--------|-----|---------|
 | `started` | assignee | Beginning an assignment |
 | `completed` | assignee | Finished deliverables |
-| `delegated` | system | Spawned a subagent |
+| `delegated` | foreman | Spawned a subagent |
 | `blocked` | any | Cannot proceed — include reason in `--details` |
-| `adjusted` | system | Roadmap re-sequenced |
-| `milestone_updated` | system | Milestone status changed |
+| `adjusted` | foreman | Roadmap re-sequenced |
+| `milestone_updated` | foreman | Milestone status changed |
 | `audited` | auditor | Verdict recorded |
 | `note` | any | Informational |
 | `message` | any | Agent-to-agent message (use `--body`, `--from-agent`, `--to-agent`, `--kind`) |

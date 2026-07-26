@@ -12,7 +12,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-VALID_AGENTS = {"system", "architect", "implementer", "tester", "auditor", "user", "hook"}
+VALID_AGENTS = {"foreman", "architect", "implementer", "tester", "auditor", "user", "hook"}
 VALID_ACTIONS = {
     "started",
     "completed",

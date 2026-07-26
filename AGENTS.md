@@ -1,6 +1,6 @@
 # Software Development Factory
 
-Multi-agent orchestration for building software in Cursor. A **system** overseer delegates to specialists, tracks a **roadmap** toward a **project vision**, and ensures quality through an **auditor**.
+Multi-agent orchestration for building software in Cursor. A **Foreman** delegates to specialists, tracks a **roadmap** toward a **project vision**, and ensures quality through an **auditor**.
 
 ## Architecture
 
@@ -13,36 +13,36 @@ flowchart TB
         A[assignments/]
     end
 
-    S[System Agent]
+ F[Foreman]
     AR[Architect]
     IM[Implementer]
     T[Tester]
     AU[Auditor]
 
-    V --> S
-    R --> S
-    S -->|delegates| AR
-    S -->|delegates| IM
-    S -->|delegates| T
-    S -->|delegates| AU
+    V --> F
+    R --> F
+    F -->|delegates| AR
+    F -->|delegates| IM
+    F -->|delegates| T
+    F -->|delegates| AU
     AR --> L
     IM --> L
     T --> L
     AU --> L
-    S --> A
+    F --> A
     AR --> A
     IM --> A
     T --> A
     AU --> A
-    AU -->|pass/fail| S
-    S --> R
+    AU -->|pass/fail| F
+    F --> R
 ```
 
 ## Agents
 
 | Agent | Invoke | Role |
 |-------|--------|------|
-| **System** | `/system` | Oversees project, delegates tasks, tracks roadmap, adjusts plan |
+| **Foreman** | `/foreman` | Oversees project, delegates tasks, tracks roadmap, adjusts plan |
 | **Architect** | `/architect` | Architecture and folder structure |
 | **Implementer** | `/implementer` | Application code and features |
 | **Tester** | `/tester` | Create and conduct e2e tests |
@@ -95,10 +95,10 @@ Workspace rules in [.cursor/rules/factory-workspace.mdc](.cursor/rules/factory-w
 
 1. **Define vision** — Edit `factory/project-vision.md`
 2. **Plan roadmap** — Edit `factory/roadmap.md` with milestones
-3. **Orchestrate** — `/system` reads vision + roadmap, delegates via **factory-delegate**
+3. **Orchestrate** — `/foreman` reads vision + roadmap, delegates via **factory-delegate**
 4. **Execute** — Specialists (`/architect`, `/implementer`, `/tester`) complete assignments and log actions
-5. **Verify** — `/auditor` validates completion; system updates roadmap on pass
-6. **Adjust** — System re-sequences milestones and logs adjustments as needed
+5. **Verify** — `/auditor` validates completion; Foreman updates roadmap on pass
+6. **Adjust** — Foreman re-sequences milestones and logs adjustments as needed
 
 ## Logging
 
@@ -106,7 +106,7 @@ All agents log actions:
 
 ```bash
 python .cursor/skills/factory-log/scripts/log-action.py \
-  --agent system \
+  --agent foreman \
   --action delegated \
   --assignment-id architect-M1-01 \
   --milestone M1 \
@@ -124,7 +124,7 @@ python .cursor/skills/factory-log/scripts/view-messages.py
 ```
 Fill in factory/project-vision.md and factory/roadmap.md, then:
 
-/system
+/foreman
 
 Read the factory artifacts and delegate the first milestone.
 ```

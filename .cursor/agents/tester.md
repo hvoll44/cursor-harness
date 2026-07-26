@@ -36,10 +36,10 @@ Typical outputs (as specified in the assignment):
 2. Update assignment status to `completed`
 3. Log `completed` via **factory-log** with pass/fail summary
 4. Commit the assignment's deliverables, assignment status, and log entry locally
-5. Report the commit hash and coverage gaps the system agent should schedule
+5. Report the commit hash and coverage gaps the Foreman should schedule
 
-Do not mark roadmap milestones `done` — that requires system + auditor sign-off.
+Do not mark roadmap milestones `done` — that requires Foreman + auditor sign-off.
 
 ## Local commits
 
-Before committing, inspect `git status --short` and `git diff`. Stage only files owned by this assignment; never use `git add .` or `git add -A`, which could capture another agent's work. Make one concise local commit for the completed assignment and do not run `git push`. If unrelated changes already exist, leave them unstaged and report them to the system agent.
+Before committing, inspect `git status --short` and `git diff`. Stage only files owned by this assignment; never use `git add .` or `git add -A`, which could capture another agent's work. Make one concise local commit for the completed assignment and do not run `git push`. If unrelated changes already exist, leave them unstaged and report them to the Foreman.

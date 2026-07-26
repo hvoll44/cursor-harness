@@ -48,12 +48,12 @@ def main() -> int:
             "permission": "deny",
             "user_message": (
                 f"Edit blocked: `{rel}` is under done milestone path `{prefix}`. "
-                "Ask /system to reopen the milestone in factory/roadmap.md before "
+                "Ask /foreman to reopen the milestone in factory/roadmap.md before "
                 "editing this path."
             ),
             "agent_message": (
                 f"Cannot modify `{rel}` — it belongs to a completed milestone. "
-                "Ask /system to reopen the milestone, log the adjustment, and "
+                "Ask /foreman to reopen the milestone, log the adjustment, and "
                 "delegate a rework assignment."
             ),
         }

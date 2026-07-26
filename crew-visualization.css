@@ -56,7 +56,7 @@ h3 { font: 700 1.08rem/1.1 Georgia, serif; letter-spacing: -.015em; }
 .agent-topline { display: flex; justify-content: space-between; align-items: center; }
 .agent-mark { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: #fff; background: var(--teal); font-weight: 800; font-size: .8rem; }
 .command { display: inline-block; margin-top: 15px; color: var(--teal); font: 700 .72rem ui-monospace, SFMono-Regular, Consolas, monospace; }
-.system { border: 2px solid var(--teal); background: linear-gradient(145deg, #fff, #effaf6); }
+.foreman { border: 2px solid var(--teal); background: linear-gradient(145deg, #fff, #effaf6); }
 
 .specialist-area { position: relative; padding-left: 48px; }
 .branch-line { position: absolute; left: 22px; top: 21%; bottom: 21%; width: 1px; background: var(--line); }
@@ -114,7 +114,7 @@ code { display: inline-block; margin-top: 7px; color: var(--teal); font-size: .6
 .log-meta { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin-bottom: 7px; }
 .agent-label, .event-label { font-size: .61rem; font-weight: 800; letter-spacing: .09em; }
 .agent-label { padding: 4px 6px; color: #fff; border-radius: 2px; }
-.system-label { background: var(--teal); }
+.foreman-label { background: var(--teal); }
 .architect-label { background: #b87a14; }
 .implementer-label { background: #b95745; }
 .auditor-label { background: var(--violet); }

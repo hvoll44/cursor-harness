@@ -9,12 +9,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-FACTORY_AGENTS = frozenset({"system", "architect", "implementer", "tester", "auditor"})
+FACTORY_AGENTS = frozenset({"foreman", "architect", "implementer", "tester", "auditor"})
 FACTORY_SUBAGENT_TYPES = frozenset(
-    {"architect", "implementer", "tester", "auditor", "system", "generalPurpose", "explore", "shell"}
+    {"architect", "implementer", "tester", "auditor", "foreman", "generalPurpose", "explore", "shell"}
 )
 ASSIGNMENT_ID_RE = re.compile(
-    r"\b(architect|implementer|tester|auditor|system)-M\d+-\d+\b", re.IGNORECASE
+    r"\b(architect|implementer|tester|auditor|foreman)-M\d+-\d+\b", re.IGNORECASE
 )
 ASSIGNMENT_PATH_RE = re.compile(r"factory/assignments/[\w-]+\.md", re.IGNORECASE)
 MILESTONE_ID_RE = re.compile(r"\bM\d+\b")
@@ -268,13 +268,13 @@ def assignment_lifecycle_ready(root: Path, assignment_id: str) -> tuple[bool, st
                 continue
             if entry.get("assignment_id") != assignment_id:
                 continue
-            if entry.get("agent") == "system" and entry.get("action") == "delegated":
+            if entry.get("agent") in {"foreman", "system"} and entry.get("action") == "delegated":
                 delegated = True
             if entry.get("agent") == assignee and entry.get("action") in {"started", "completed"}:
                 lifecycle.add(entry["action"])
 
     if not delegated:
-        return False, "missing system delegated log"
+        return False, "missing Foreman delegated log"
     missing = {"started", "completed"} - lifecycle
     if missing:
         return False, f"missing {', '.join(sorted(missing))} log from assignee `{assignee}`"
@@ -295,10 +295,10 @@ def parse_tool_input(data: dict) -> dict:
 
 def infer_parent_agent(data: dict) -> str:
     agent_message = (data.get("agent_message") or "").lower()
-    for agent in ("system", "architect", "implementer", "tester", "auditor"):
+    for agent in ("foreman", "architect", "implementer", "tester", "auditor"):
         if f"/{agent}" in agent_message or re.search(rf"\b{agent}\b", agent_message):
             return agent
-    return "system"
+    return "foreman"
 
 
 def is_factory_task_subagent(subagent_type: str, prompt: str) -> bool:

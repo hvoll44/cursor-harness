@@ -118,9 +118,9 @@ def test_auditor_denies_wrong_agent_logs():
     assignment_id = "implementer-M1-01"
     write_assignment(assignment_id, "implementer")
     write_log_entries(
-        {"agent": "system", "action": "delegated", "assignment_id": assignment_id},
-        {"agent": "system", "action": "started", "assignment_id": assignment_id},
-        {"agent": "system", "action": "completed", "assignment_id": assignment_id},
+        {"agent": "foreman", "action": "delegated", "assignment_id": assignment_id},
+        {"agent": "foreman", "action": "started", "assignment_id": assignment_id},
+        {"agent": "foreman", "action": "completed", "assignment_id": assignment_id},
     )
     out = run_hook(
         "subagent_start.py",
@@ -135,7 +135,7 @@ def test_auditor_allows_assignee_lifecycle():
     assignment_id = "implementer-M1-02"
     write_assignment(assignment_id, "implementer")
     write_log_entries(
-        {"agent": "system", "action": "delegated", "assignment_id": assignment_id},
+        {"agent": "foreman", "action": "delegated", "assignment_id": assignment_id},
         {"agent": "implementer", "action": "started", "assignment_id": assignment_id},
         {"agent": "implementer", "action": "completed", "assignment_id": assignment_id},
     )
@@ -148,6 +148,25 @@ def test_auditor_allows_assignee_lifecycle():
     )
     assert out.get("permission") == "allow"
     print("auditor allows assignee lifecycle: ok")
+
+
+def test_auditor_accepts_legacy_system_delegation():
+    assignment_id = "implementer-M1-03"
+    write_assignment(assignment_id, "implementer")
+    write_log_entries(
+        {"agent": "system", "action": "delegated", "assignment_id": assignment_id},
+        {"agent": "implementer", "action": "started", "assignment_id": assignment_id},
+        {"agent": "implementer", "action": "completed", "assignment_id": assignment_id},
+    )
+    out = run_hook(
+        "subagent_start.py",
+        {
+            "task": f"Assignment: factory/assignments/{assignment_id}.md",
+            "subagent_type": "auditor",
+        },
+    )
+    assert out.get("permission") == "allow"
+    print("auditor accepts legacy System delegation: ok")
 
 
 def test_subagent_stop_followup():
@@ -276,7 +295,7 @@ def test_run_log_reports_failure():
     try:
         with redirect_stderr(stderr):
             assert not factory_lib.run_log(
-                WORKSPACE_ROOT, "system", "note", "Expected failing log"
+                WORKSPACE_ROOT, "foreman", "note", "Expected failing log"
             )
     finally:
         factory_lib.LOG_SCRIPT = previous_script
@@ -389,6 +408,7 @@ def main() -> int:
             test_subagent_start_allows_with_assignment,
             test_auditor_denies_wrong_agent_logs,
             test_auditor_allows_assignee_lifecycle,
+            test_auditor_accepts_legacy_system_delegation,
             test_subagent_stop_followup,
             test_subagent_stop_followup_implementer,
             test_log_task_delegation,

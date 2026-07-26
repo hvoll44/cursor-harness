@@ -1,11 +1,11 @@
 ---
 name: factory-delegate
-description: Create factory assignments and delegation prompts for architect, implementer, tester, or auditor subagents. Use when the system agent delegates work while preserving parent context.
+description: Create factory assignments and delegation prompts for architect, implementer, tester, or auditor subagents. Use when the Foreman delegates work while preserving parent context.
 ---
 
 # Factory Delegate
 
-Deterministic workflow for the **system** agent to delegate work to specialists.
+Deterministic workflow for the **Foreman** to delegate work to specialists.
 
 ## Steps
 
@@ -35,7 +35,7 @@ Replace placeholders:
 - `{milestone_id}` → milestone ID
 - `{ISO8601}` → current UTC timestamp
 
-Fill **Objective**, **Context from System**, **Acceptance Criteria**, and **Deliverables**.
+Fill **Objective**, **Context from Foreman**, **Acceptance Criteria**, and **Deliverables**.
 
 ### 4. Update roadmap
 
@@ -48,7 +48,7 @@ In [factory/roadmap.md](../../../factory/roadmap.md):
 
 ```bash
 python .cursor/skills/factory-log/scripts/log-action.py \
-  --agent system \
+  --agent foreman \
   --action delegated \
   --assignment-id {assignment-id} \
   --milestone {milestone-id} \
@@ -59,9 +59,9 @@ Also log the delegation prompt as a message (or rely on the Task hook to capture
 
 ```bash
 python .cursor/skills/factory-log/scripts/log-action.py \
-  --agent system \
+  --agent foreman \
   --action message \
-  --from-agent system \
+  --from-agent foreman \
   --to-agent {agent} \
   --kind delegation \
   --assignment-id {assignment-id} \
@@ -71,14 +71,14 @@ python .cursor/skills/factory-log/scripts/log-action.py \
 
 ### 6. Invoke subagent
 
-Use explicit invocation with the assignment path and pasted **Context from System**:
+Use explicit invocation with the assignment path and pasted **Context from Foreman**:
 
 ```
 /{agent}
 
 Assignment: factory/assignments/{assignment-id}.md
 
-[Paste Context from System section here]
+[Paste Context from Foreman section here]
 
 Acceptance criteria:
 [Paste criteria here]

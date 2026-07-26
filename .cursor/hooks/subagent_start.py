@@ -71,7 +71,7 @@ def main() -> int:
                     "permission": "deny",
                     "user_message": (
                         f"Auditor blocked: `{assignment_id}` {reason}. "
-                        "Require system delegation plus assignee `started` and "
+                        "Require Foreman delegation plus assignee `started` and "
                         "`completed` entries in factory/log/."
                     ),
                 }
@@ -100,7 +100,7 @@ def main() -> int:
     run_log(root, agent, "started", summary, assignment_id=assignment_id or "")
 
     if task.strip():
-        parent = "system"
+        parent = "foreman"
         msg_summary = f"Prompt to `{agent}`"
         if assignment_id:
             msg_summary += f" ({assignment_id})"

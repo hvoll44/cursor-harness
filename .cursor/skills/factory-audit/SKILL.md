@@ -13,10 +13,10 @@ Assignment file exists at `factory/assignments/{id}.md` with:
 
 - [ ] **Status** set to `completed` by assignee
 - [ ] All **Deliverables** listed and present on disk
-- [ ] System logged `delegated`, and the declared assignee logged `started` and
+- [ ] Foreman logged `delegated`, and the declared assignee logged `started` and
   `completed`, in `factory/log/`
 
-## Quick self-check (system agent)
+## Quick self-check (Foreman)
 
 | Assignee | Verify |
 |----------|--------|
@@ -38,7 +38,7 @@ Return pass/fail with evidence.
 
 ## After verdict
 
-| Verdict | System action |
+| Verdict | Foreman action |
 |---------|---------------|
 | `pass` | Update milestone to `done` via **factory-roadmap** skill |
 | `fail` | Set milestone `blocked`; delegate rework with new assignment ID |

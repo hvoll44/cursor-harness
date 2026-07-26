@@ -67,7 +67,7 @@ def main() -> int:
         agent=from_agent,
         summary=summary,
         from_agent=from_agent,
-        to_agent="system",
+        to_agent="foreman",
         kind="tool_result",
         body=output,
         assignment_id=assignment_id,

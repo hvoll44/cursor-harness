@@ -12,7 +12,7 @@
     <header class="hero">
       <p class="eyebrow">CURSOR-NATIVE DELIVERY FRAMEWORK</p>
       <h1>How the Crew works</h1>
-      <p class="lede">A system agent steers specialists through a traceable delivery loop: plan, delegate, build, verify, repeat.</p>
+      <p class="lede">The Foreman steers specialists through a traceable delivery loop: plan, delegate, build, verify, repeat.</p>
     </header>
 
     <section class="workflow" aria-labelledby="workflow-title">
@@ -44,14 +44,14 @@
 
         <div class="connector input-connector" aria-hidden="true"></div>
 
-        <article class="agent-card system">
+        <article class="agent-card foreman">
           <div class="agent-topline">
             <span class="role-tag">COORDINATOR</span>
-            <span class="agent-mark">S</span>
+            <span class="agent-mark">F</span>
           </div>
-          <h3>System</h3>
+          <h3>Foreman</h3>
           <p>Reads the vision and roadmap, selects the next task, delegates it, and tracks progress.</p>
-          <span class="command">/system</span>
+          <span class="command">/foreman</span>
         </article>
 
         <div class="specialist-area">
@@ -98,7 +98,7 @@
         </div>
       </div>
 
-      <p class="diagram-note"><span></span>Each specialist’s assignment is independently verified before the System advances the milestone.</p>
+      <p class="diagram-note"><span></span>Each specialist’s assignment is independently verified before the Foreman advances the milestone.</p>
     </section>
 
     <section class="detail-grid" aria-label="Workflow details">
@@ -111,7 +111,7 @@
           </div>
         </div>
         <ol class="sequence">
-          <li><span>01</span><div><strong>Frame the work</strong><p>Vision and roadmap give the System its context.</p></div></li>
+          <li><span>01</span><div><strong>Frame the work</strong><p>Vision and roadmap give the Foreman its context.</p></div></li>
           <li><span>02</span><div><strong>Delegate an assignment</strong><p>A focused brief is handed to the right specialist.</p></div></li>
           <li><span>03</span><div><strong>Produce evidence</strong><p>The specialist changes code, tests, or architecture and logs the outcome.</p></div></li>
           <li><span>04</span><div><strong>Audit the result</strong><p>The Auditor passes or returns the assignment for correction.</p></div></li>
@@ -159,11 +159,11 @@
       </div>
 
       <div class="activity-feed">
-        <article class="log-entry system-entry">
+        <article class="log-entry foreman-entry">
           <time datetime="2026-07-25T18:04:08Z">18:04</time>
           <div class="timeline-dot" aria-hidden="true"></div>
           <div class="log-content">
-            <div class="log-meta"><span class="agent-label system-label">SYSTEM</span><span class="event-label">DELEGATED · M1</span></div>
+            <div class="log-meta"><span class="agent-label foreman-label">FOREMAN</span><span class="event-label">DELEGATED · M1</span></div>
             <p>Delegated the static Tetris architecture and foundation plan to the Architect.</p>
             <code>architect-M1-01</code>
           </div>
@@ -186,11 +186,11 @@
             <code>architect-M1-01</code>
           </div>
         </article>
-        <article class="log-entry system-entry">
+        <article class="log-entry foreman-entry">
           <time datetime="2026-07-25T18:07:46Z">18:07</time>
           <div class="timeline-dot" aria-hidden="true"></div>
           <div class="log-content">
-            <div class="log-meta"><span class="agent-label system-label">SYSTEM</span><span class="event-label">DELEGATED · M2</span></div>
+            <div class="log-meta"><span class="agent-label foreman-label">FOREMAN</span><span class="event-label">DELEGATED · M2</span></div>
             <p>Moved M2 into progress and assigned the deterministic game engine to the Implementer.</p>
             <code>implementer-M2-01</code>
           </div>
@@ -213,17 +213,17 @@
             <code>implementer-M2-01</code>
           </div>
         </article>
-        <article class="log-entry system-entry">
+        <article class="log-entry foreman-entry">
           <time datetime="2026-07-25T18:16:10Z">18:16</time>
           <div class="timeline-dot" aria-hidden="true"></div>
           <div class="log-content">
-            <div class="log-meta"><span class="agent-label system-label">SYSTEM</span><span class="event-label done-label">MILESTONE DONE · M2</span></div>
+            <div class="log-meta"><span class="agent-label foreman-label">FOREMAN</span><span class="event-label done-label">MILESTONE DONE · M2</span></div>
             <p>Marked M2 complete after the Auditor’s pass, readying the next milestone.</p>
             <code>implementer-M2-01</code>
           </div>
         </article>
       </div>
-      <p class="log-footnote">The feed turns append-only JSONL events into a chronological story. Refresh this section when you add new entries to the log file.</p>
+      <p class="log-footnote">The feed turns append-only JSONL events into a chronological story. Legacy <code>system</code> records are presented as Foreman; refresh this section when you add new entries to the log file.</p>
     </section>
 
     <footer>

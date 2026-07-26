@@ -19,9 +19,9 @@ from factory_lib import (
 )
 
 FACTORY_MENTION = re.compile(
-    r"\b(system|architect|implementer|tester|auditor)\b|"
+    r"\b(foreman|architect|implementer|tester|auditor)\b|"
     r"factory/assignments/|"
-    r"/(?:architect|implementer|tester|auditor|system)\b",
+    r"/(?:architect|implementer|tester|auditor|foreman)\b",
     re.I,
 )
 
@@ -35,7 +35,7 @@ def main() -> int:
 
     root = repo_root(data)
     assignment_id = parse_assignment_id(text) or ""
-    agent = detect_factory_agent(text) or "system"
+    agent = detect_factory_agent(text) or "foreman"
 
     run_log_message(
         root,

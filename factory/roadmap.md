@@ -1,6 +1,6 @@
 # Roadmap
 
-> How to achieve the [project vision](project-vision.md). The system agent tracks progress here and adjusts sequencing when blockers appear.
+> How to achieve the [project vision](project-vision.md). The Foreman tracks progress here and adjusts sequencing when blockers appear.
 
 **Status legend:** `pending` · `in_progress` · `blocked` · `done` · `skipped`
 
@@ -32,7 +32,7 @@ _None._
 
 ## Completion Checklist
 
-Before marking the project complete, the system agent verifies:
+Before marking the project complete, the Foreman verifies:
 
 - [ ] All milestones are `done` or explicitly `skipped`
 - [ ] [project-vision.md](project-vision.md) success criteria are met

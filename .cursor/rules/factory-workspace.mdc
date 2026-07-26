@@ -25,7 +25,7 @@ Factory hooks in `.cursor/hooks.json` enforce workflow automatically. Agents sho
 
 | Role | Subagent | Responsibility |
 |------|----------|----------------|
-| System | `/system` | Oversees project, delegates, tracks roadmap, adjusts plan |
+| Foreman | `/foreman` | Oversees project, delegates, tracks roadmap, adjusts plan |
 | Architect | `/architect` | Architecture and folder structure |
 | Implementer | `/implementer` | Application code and features |
 | Tester | `/tester` | Create and run e2e tests |
@@ -44,7 +44,7 @@ Factory hooks in `.cursor/hooks.json` enforce workflow automatically. Agents sho
 
 1. Fill in `factory/project-vision.md`
 2. Define milestones in `factory/roadmap.md`
-3. Invoke `/system` to plan and delegate the first assignments
+3. Invoke `/foreman` to plan and delegate the first assignments
 
 ## Skills (deterministic tools)
 

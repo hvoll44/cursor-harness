@@ -21,13 +21,13 @@ In the **Milestones** table, set **Status** to one of:
 | `in_progress` | Active assignment exists |
 | `blocked` | Waiting on external dependency or failed audit |
 | `done` | Auditor passed; deliverables verified |
-| `skipped` | System explicitly descoped with reason in Notes |
+| `skipped` | Foreman explicitly descoped with reason in Notes |
 
 After changing status, log:
 
 ```bash
 python .cursor/skills/factory-log/scripts/log-action.py \
-  --agent system \
+  --agent foreman \
   --action milestone_updated \
   --milestone M2 \
   --summary "M2 set to in_progress"
