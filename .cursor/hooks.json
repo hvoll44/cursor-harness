@@ -5,6 +5,16 @@
       {
         "command": "python .cursor/hooks/session_start.py",
         "timeout": 10
+      },
+      {
+        "command": "python .cursor/hooks/sync_gitignore.py",
+        "timeout": 10
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "python .cursor/hooks/sync_gitignore.py",
+        "timeout": 10
       }
     ],
     "subagentStart": [
@@ -57,6 +67,12 @@
         "matcher": "git push",
         "timeout": 10,
         "failClosed": true
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": "python .cursor/hooks/sync_gitignore.py",
+        "timeout": 10
       }
     ]
   }

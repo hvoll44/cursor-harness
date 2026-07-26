@@ -18,6 +18,7 @@ WORKSPACE_ROOT = ROOT
 sys.path.insert(0, str(HOOKS))
 
 import factory_lib
+import sync_gitignore
 
 
 def run_hook(script: str, payload: dict) -> dict:
@@ -303,6 +304,36 @@ def test_run_log_reports_failure():
     print("run_log failure reporting: ok")
 
 
+def test_gitignore_sync_adds_detected_artifact_once():
+    cache = WORKSPACE_ROOT / ".pytest_cache"
+    cache.mkdir()
+    (cache / "state.json").write_text("{}", encoding="utf-8")
+
+    assert ".pytest_cache/" in sync_gitignore.sync_gitignore(WORKSPACE_ROOT)
+    assert sync_gitignore.sync_gitignore(WORKSPACE_ROOT) == []
+    gitignore = (WORKSPACE_ROOT / ".gitignore").read_text(encoding="utf-8")
+    assert gitignore.count(".pytest_cache/") == 1
+    print("gitignore sync adds detected artifact once: ok")
+
+
+def test_gitignore_sync_never_ignores_tracked_artifact():
+    cache = WORKSPACE_ROOT / ".mypy_cache"
+    cache.mkdir()
+    state = cache / "state.json"
+    state.write_text("{}", encoding="utf-8")
+    subprocess.run(
+        ["git", "-C", str(WORKSPACE_ROOT), "add", str(state.relative_to(WORKSPACE_ROOT))],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert ".mypy_cache/" not in sync_gitignore.sync_gitignore(WORKSPACE_ROOT)
+    gitignore = (WORKSPACE_ROOT / ".gitignore").read_text(encoding="utf-8")
+    assert ".mypy_cache/" not in gitignore
+    print("gitignore sync skips tracked artifact: ok")
+
+
 def test_subagent_stop_followup_implementer():
     out = run_hook(
         "subagent_stop.py",
@@ -388,6 +419,12 @@ def main() -> int:
     global WORKSPACE_ROOT
     with tempfile.TemporaryDirectory() as directory:
         WORKSPACE_ROOT = Path(directory)
+        subprocess.run(
+            ["git", "init", "-q", str(WORKSPACE_ROOT)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         factory = WORKSPACE_ROOT / "factory"
         (factory / "assignments").mkdir(parents=True)
         (factory / "project-vision.md").write_text(
@@ -424,6 +461,8 @@ def main() -> int:
             test_block_git_push_allows_commit,
             test_block_git_push_denies_global_option,
             test_run_log_reports_failure,
+            test_gitignore_sync_adds_detected_artifact_once,
+            test_gitignore_sync_never_ignores_tracked_artifact,
         ]
         for test in tests:
             test()

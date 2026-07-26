@@ -98,6 +98,22 @@ python .cursor/skills/factory-log/scripts/view-messages.py --assignment-id imple
 
 Full bodies are stored under `factory/log/messages/YYYY-MM-DD/`.
 
+### 10 — Synchronize generated-file ignores
+
+**Events:** `sessionStart`, `afterFileEdit`, `afterShellExecution`
+**Script:** `sync_gitignore.py`
+
+Maintains `.gitignore` for a narrow, safe allowlist of generated artifacts:
+
+- Python bytecode and caches: `__pycache__/`, `*.py[cod]`
+- Test/type/lint output: `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/`, `.coverage`, `htmlcov/`
+- Factory runtime activity: `factory/log/`
+
+The hook appends a missing pattern only after it finds the matching artifact and
+verifies Git does not track it. It never removes or rewrites existing rules,
+adds broad catch-all patterns, or ignores source and Cursor configuration.
+Failures are fail-open so routine work is not blocked.
+
 ## Milestone path protection
 
 When marking a milestone `done` in the roadmap, register its paths:
