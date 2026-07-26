@@ -58,6 +58,23 @@ def daily_log_path(when: datetime) -> Path:
     return log_dir() / f"{when.strftime('%Y-%m-%d')}.jsonl"
 
 
+def update_log_index(when: datetime) -> Path:
+    """Publish the JSONL filenames that the static Crew viewer can load."""
+    directory = log_dir()
+    logs = sorted(
+        path.name for path in directory.glob("*.jsonl") if path.name != "index.json"
+    )
+    index = {
+        "generated_at": when.isoformat(),
+        "logs": logs,
+    }
+    path = directory / "index.json"
+    temporary = path.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)
+    return path
+
+
 def preview(text: str, limit: int = 240) -> str:
     collapsed = re.sub(r"\s+", " ", text.strip())
     if len(collapsed) <= limit:
@@ -180,6 +197,7 @@ def main() -> int:
     path = daily_log_path(now)
     with path.open("a", encoding="utf-8") as f:
         f.write(line + "\n")
+    update_log_index(now)
 
     print(path)
     print(line)
